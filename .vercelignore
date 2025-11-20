@@ -1,0 +1,7 @@
+node_modules
+.env
+logs
+*.log
+.DS_Store
+test-connection.js
+setup-db.js
