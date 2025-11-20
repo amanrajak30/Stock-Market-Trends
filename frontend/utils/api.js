@@ -1,6 +1,6 @@
-const API_BASE = process.env.NODE_ENV === 'production' 
-  ? 'https://your-backend-url.vercel.app/api'
-  : 'http://localhost:3000/api';
+const API_BASE = window.location.hostname === 'localhost'
+  ? 'http://localhost:3000/api'
+  : 'https://trading-platform-backend-production-99a6.up.railway.app/api';
 
 class API {
   constructor() {

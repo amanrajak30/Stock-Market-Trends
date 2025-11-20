@@ -7,7 +7,7 @@ class Market {
   connect(token) {
     const socketUrl = window.location.hostname === 'localhost' 
       ? 'http://localhost:3000' 
-      : 'https://your-backend-url.vercel.app';
+      : 'https://trading-platform-backend-production-99a6.up.railway.app';
     
     // Private socket for user updates
     this.socket = io(socketUrl, {
