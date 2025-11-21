@@ -1,5 +1,6 @@
 const express = require('express');
-const { getPool } = require('../db');
+const Watchlist = require('../models/Watchlist');
+const Stock = require('../models/Stock');
 const authMiddleware = require('../middleware/auth');
 const logger = require('../logger');
 
@@ -9,16 +10,15 @@ router.get('/', authMiddleware, async (req, res) => {
   const userId = req.user.userId;
   
   try {
-    const pool = getPool();
-    const [watchlist] = await pool.query(
-      `SELECT w.id, s.* 
-       FROM watchlist w 
-       JOIN stocks s ON w.stock_id = s.id 
-       WHERE w.user_id = ?`,
-      [userId]
-    );
+    const watchlist = await Watchlist.find({ user_id: userId })
+      .populate('stock_id');
     
-    res.json({ watchlist });
+    const formattedWatchlist = watchlist.map(item => ({
+      id: item._id,
+      ...item.stock_id.toObject()
+    }));
+    
+    res.json({ watchlist: formattedWatchlist });
   } catch (error) {
     logger.error('Failed to fetch watchlist', { userId, error: error.message });
     res.status(500).json({ error: 'Failed to fetch watchlist' });
@@ -30,17 +30,16 @@ router.post('/', authMiddleware, async (req, res) => {
   const { symbol } = req.body;
   
   try {
-    const pool = getPool();
+    const stock = await Stock.findOne({ symbol: symbol.toUpperCase() });
     
-    const [stocks] = await pool.query('SELECT id FROM stocks WHERE symbol = ?', [symbol.toUpperCase()]);
-    
-    if (stocks.length === 0) {
+    if (!stock) {
       return res.status(404).json({ error: 'Stock not found' });
     }
     
-    await pool.query(
-      'INSERT IGNORE INTO watchlist (user_id, stock_id) VALUES (?, ?)',
-      [userId, stocks[0].id]
+    await Watchlist.findOneAndUpdate(
+      { user_id: userId, stock_id: stock._id },
+      { user_id: userId, stock_id: stock._id },
+      { upsert: true, new: true }
     );
     
     res.json({ success: true });
@@ -55,9 +54,7 @@ router.delete('/:id', authMiddleware, async (req, res) => {
   const { id } = req.params;
   
   try {
-    const pool = getPool();
-    await pool.query('DELETE FROM watchlist WHERE id = ? AND user_id = ?', [id, userId]);
-    
+    await Watchlist.deleteOne({ _id: id, user_id: userId });
     res.json({ success: true });
   } catch (error) {
     logger.error('Failed to remove from watchlist', { userId, id, error: error.message });

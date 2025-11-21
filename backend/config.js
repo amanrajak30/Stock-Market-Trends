@@ -2,11 +2,7 @@ require('dotenv').config({ path: require('path').join(__dirname, '..', '.env') }
 
 module.exports = {
   db: {
-    host: process.env.DB_HOST || 'localhost',
-    port: process.env.DB_PORT || 3306,
-    user: process.env.DB_USER || 'root',
-    password: process.env.DB_PASSWORD,
-    database: process.env.DB_NAME || 'trading_platform'
+    uri: process.env.MONGODB_URI || 'mongodb://localhost:27017/trading_platform'
   },
   jwt: {
     secret: process.env.JWT_SECRET || 'default_secret_change_in_production',

@@ -1,5 +1,5 @@
 const cron = require('node-cron');
-const { getPool } = require('../db');
+const Stock = require('../models/Stock');
 const { fetchStockPrice } = require('../utils/marketApi');
 const logger = require('../logger');
 
@@ -7,17 +7,16 @@ function startPriceUpdater(io) {
   // Update prices every minute
   cron.schedule('*/1 * * * *', async () => {
     try {
-      const pool = getPool();
-      const [stocks] = await pool.query('SELECT id, symbol FROM stocks');
+      const stocks = await Stock.find();
       
       for (const stock of stocks) {
         try {
           const priceData = await fetchStockPrice(stock.symbol);
           
-          await pool.query(
-            'UPDATE stocks SET last_price = ?, change_percent = ?, volume = ? WHERE id = ?',
-            [priceData.price, priceData.changePercent, priceData.volume, stock.id]
-          );
+          stock.last_price = priceData.price;
+          stock.change_percent = priceData.changePercent;
+          stock.volume = priceData.volume;
+          await stock.save();
           
           // Broadcast to market namespace
           if (io) {

@@ -1,14 +1,9 @@
-const { getPool } = require('../db');
-const { fetchStockPrice } = require('../utils/marketApi');
+const Stock = require('../models/Stock');
 const logger = require('../logger');
 
 async function listStocks(req, res) {
   try {
-    const pool = getPool();
-    const [stocks] = await pool.query(
-      'SELECT id, symbol, name, last_price, change_percent, volume, market_cap FROM stocks ORDER BY symbol'
-    );
-    
+    const stocks = await Stock.find().sort({ symbol: 1 });
     res.json({ stocks });
   } catch (error) {
     logger.error('Failed to list stocks', { error: error.message });
@@ -20,17 +15,13 @@ async function getStockDetail(req, res) {
   const { symbol } = req.params;
   
   try {
-    const pool = getPool();
-    const [stocks] = await pool.query(
-      'SELECT * FROM stocks WHERE symbol = ?',
-      [symbol.toUpperCase()]
-    );
+    const stock = await Stock.findOne({ symbol: symbol.toUpperCase() });
     
-    if (stocks.length === 0) {
+    if (!stock) {
       return res.status(404).json({ error: 'Stock not found' });
     }
     
-    res.json({ stock: stocks[0] });
+    res.json({ stock });
   } catch (error) {
     logger.error('Failed to get stock detail', { symbol, error: error.message });
     res.status(500).json({ error: 'Failed to fetch stock details' });
