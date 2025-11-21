@@ -18,6 +18,6 @@ module.exports = {
   },
   server: {
     port: process.env.PORT || 3000,
-    corsOrigin: process.env.CORS_ORIGIN || 'http://localhost:8080'
+    corsOrigin: process.env.CORS_ORIGIN || '*'
   }
 };
