@@ -52,29 +52,49 @@ class Dashboard {
   async loadStocks() {
     try {
       const data = await api.get('/stocks');
+      this.allStocks = data.stocks;
+      this.renderStocks(this.allStocks);
       
-      const stocksList = document.getElementById('stocksList');
-      stocksList.innerHTML = '';
-      
-      data.stocks.forEach(stock => {
-        const div = document.createElement('div');
-        div.className = 'stock-item';
-        div.dataset.symbol = stock.symbol;
-        div.innerHTML = `
-          <div class="stock-info">
-            <div class="stock-symbol">${stock.symbol}</div>
-            <div class="stock-name">${stock.name}</div>
-          </div>
-          <div class="stock-price ${stock.change_percent >= 0 ? 'positive' : 'negative'}">
-            $${parseFloat(stock.last_price).toFixed(2)}
-          </div>
-        `;
-        div.addEventListener('click', () => trade.openModal(stock));
-        stocksList.appendChild(div);
+      // Setup search
+      const searchInput = document.getElementById('stockSearch');
+      searchInput.addEventListener('input', (e) => {
+        const query = e.target.value.toLowerCase();
+        const filtered = this.allStocks.filter(stock => 
+          stock.symbol.toLowerCase().includes(query) || 
+          stock.name.toLowerCase().includes(query)
+        );
+        this.renderStocks(filtered);
       });
     } catch (error) {
       console.error('Failed to load stocks:', error);
     }
+  }
+
+  renderStocks(stocks) {
+    const stocksList = document.getElementById('stocksList');
+    stocksList.innerHTML = '';
+    
+    if (stocks.length === 0) {
+      stocksList.innerHTML = '<p style="padding: 1rem; text-align: center; color: #666;">No stocks found</p>';
+      return;
+    }
+    
+    stocks.forEach(stock => {
+      const div = document.createElement('div');
+      div.className = 'stock-item';
+      div.dataset.symbol = stock.symbol;
+      div.innerHTML = `
+        <div class="stock-info">
+          <div class="stock-symbol">${stock.symbol}</div>
+          <div class="stock-name">${stock.name}</div>
+        </div>
+        <div class="stock-price ${stock.change_percent >= 0 ? 'positive' : 'negative'}">
+          $${parseFloat(stock.last_price).toFixed(2)}
+        </div>
+      `;
+      div.addEventListener('click', () => trade.openModal(stock));
+      stocksList.appendChild(div);
+    });
   }
 
   async loadWatchlist() {

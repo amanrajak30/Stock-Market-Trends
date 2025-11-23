@@ -54,6 +54,9 @@
 
                 <section class="market-section">
                     <h2>Market</h2>
+                    <div class="search-container">
+                        <input type="text" id="stockSearch" placeholder="Search stocks by symbol or name..." />
+                    </div>
                     <div id="stocksList"></div>
                 </section>
 
@@ -84,7 +87,7 @@
         </div>
     </div>
 
-    <script src="/socket.io/socket.io.js"></script>
+    <script src="https://cdn.socket.io/4.6.1/socket.io.min.js"></script>
     <script src="utils/api.js"></script>
     <script src="auth.js"></script>
     <script src="market.js"></script>

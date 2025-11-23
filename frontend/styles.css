@@ -109,6 +109,18 @@ section h2 {
     color: #333;
 }
 
+.search-container {
+    margin-bottom: 1rem;
+}
+
+#stockSearch {
+    width: 100%;
+    padding: 0.75rem;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 1rem;
+}
+
 .portfolio-summary {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
