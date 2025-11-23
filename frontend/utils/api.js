@@ -36,7 +36,8 @@ class API {
       const data = await response.json();
 
       if (!response.ok) {
-        throw new Error(data.error || 'Request failed');
+        const errorMsg = data.error || data.errors?.[0]?.msg || data.message || 'Request failed';
+        throw new Error(errorMsg);
       }
 
       return data;

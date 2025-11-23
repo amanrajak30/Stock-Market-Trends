@@ -2,8 +2,7 @@ const { body, validationResult } = require('express-validator');
 
 const tradeValidation = [
   body('symbol').isString().trim().notEmpty().withMessage('Symbol is required'),
-  body('quantity').isInt({ min: 1 }).withMessage('Quantity must be a positive integer'),
-  body('type').isIn(['BUY', 'SELL']).withMessage('Type must be BUY or SELL')
+  body('quantity').isInt({ min: 1 }).withMessage('Quantity must be a positive integer')
 ];
 
 function validate(req, res, next) {
