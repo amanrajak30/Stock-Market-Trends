@@ -39,17 +39,20 @@ class Trade {
     }
 
     try {
+      console.log('Executing trade:', { type, symbol: this.currentStock.symbol, quantity });
       const endpoint = type === 'BUY' ? '/trade/buy' : '/trade/sell';
       const data = await api.post(endpoint, {
         symbol: this.currentStock.symbol,
         quantity
       });
 
+      console.log('Trade successful:', data);
       this.closeModal();
       window.dashboard.loadPortfolio();
-      window.dashboard.showNotification(`${type} order executed successfully!`);
+      alert(`${type} order executed successfully!`);
     } catch (error) {
-      errorDiv.textContent = error.message;
+      console.error('Trade failed:', error);
+      errorDiv.textContent = error.message || 'Trade failed. Please try again.';
     }
   }
 }
