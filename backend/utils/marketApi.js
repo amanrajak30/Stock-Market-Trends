@@ -28,14 +28,18 @@ async function fetchStockPrice(symbol) {
       return getMockPrice(symbol);
     }
     
-    logger.info('Using Finnhub API', { symbol, apiKeyLength: config.market.apiKey.length });
+    const apiKey = config.market.apiKey.trim();
+    logger.info('Using Finnhub API', { 
+      symbol, 
+      apiKeyLength: apiKey.length,
+      apiKeyPreview: apiKey.substring(0, 10) + '...'
+    });
 
     // Fetch real stock data from Finnhub
-    const response = await axios.get(`${FINNHUB_API_URL}/quote`, {
-      params: {
-        symbol: symbol,
-        token: config.market.apiKey
-      },
+    const url = `${FINNHUB_API_URL}/quote?symbol=${symbol}&token=${apiKey}`;
+    logger.info('API Request URL', { url: url.replace(apiKey, 'HIDDEN') });
+    
+    const response = await axios.get(url, {
       timeout: 5000
     });
 
