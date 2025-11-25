@@ -5,12 +5,10 @@ class Market {
   }
 
   connect(token) {
-    // Update this URL after deploying backend to Render
-    const BACKEND_URL = 'https://stock-trading-backend.onrender.com'; // Replace with your actual Render backend URL
-    
+    // Automatically detect backend URL based on environment
     const socketUrl = window.location.hostname === 'localhost' 
       ? 'http://localhost:3000' 
-      : BACKEND_URL;
+      : window.location.origin;
     
     // Private socket for user updates
     this.socket = io(socketUrl, {

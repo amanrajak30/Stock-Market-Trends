@@ -1,9 +1,8 @@
 // Update this URL after deploying backend to Render
-const BACKEND_URL = 'https://stock-trading-backend.onrender.com'; // Replace with your actual Render backend URL
-
+// Automatically detect backend URL based on environment
 const API_BASE = window.location.hostname === 'localhost'
   ? 'http://localhost:3000/api'
-  : `${BACKEND_URL}/api`;
+  : `${window.location.origin}/api`;
 
 class API {
   constructor() {

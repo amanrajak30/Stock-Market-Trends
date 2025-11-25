@@ -19,7 +19,10 @@ const app = express();
 const server = http.createServer(app);
 
 // Middleware
-app.use(cors({ origin: config.server.corsOrigin }));
+app.use(cors({ 
+  origin: config.server.corsOrigin === '*' ? '*' : config.server.corsOrigin,
+  credentials: true 
+}));
 app.use(express.json());
 app.use(express.static('../frontend'));
 
@@ -34,6 +37,15 @@ app.use('/api/stocks', apiLimiter, stocksRoutes);
 app.use('/api/trade', apiLimiter, tradeRoutes);
 app.use('/api/transactions', apiLimiter, transactionsRoutes);
 app.use('/api/watchlist', apiLimiter, watchlistRoutes);
+
+// Serve frontend for all other routes (SPA support)
+app.get('*', (req, res) => {
+  if (!req.path.startsWith('/api')) {
+    res.sendFile('index.html', { root: '../frontend' });
+  } else {
+    res.status(404).json({ error: 'API endpoint not found' });
+  }
+});
 
 // Error handler
 app.use(errorHandler);
