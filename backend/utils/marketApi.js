@@ -19,10 +19,16 @@ async function fetchStockPrice(symbol) {
   
   try {
     // Check if API key is configured
-    if (!config.market.apiKey || config.market.apiKey === '') {
-      logger.warn('No API key configured, using mock data', { symbol });
+    if (!config.market.apiKey || config.market.apiKey === '' || config.market.apiKey === 'undefined') {
+      logger.warn('No API key configured, using mock data', { 
+        symbol, 
+        apiKey: config.market.apiKey ? 'exists but empty' : 'not set',
+        apiKeyLength: config.market.apiKey ? config.market.apiKey.length : 0
+      });
       return getMockPrice(symbol);
     }
+    
+    logger.info('Using Finnhub API', { symbol, apiKeyLength: config.market.apiKey.length });
 
     // Fetch real stock data from Finnhub
     const response = await axios.get(`${FINNHUB_API_URL}/quote`, {
